@@ -1,0 +1,9 @@
+## Interface: 16001, 11507
+## Title: UI Scaler
+## Notes: Resize the default windows (character, bags, map, and more) one at a time. /uis to open.
+## Author: John
+## Version: 1.0.0
+## SavedVariables: UIScalerDB
+
+Core.lua
+Options.lua
