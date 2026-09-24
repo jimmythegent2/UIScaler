@@ -10,27 +10,29 @@ local ADDON, ns = ...
 local bagFrames = { "ContainerFrameCombinedBags" }
 for i = 1, 13 do bagFrames[#bagFrames + 1] = "ContainerFrame" .. i end
 
+-- Icons are Blizzard's own, shipped with the client. Not every client has
+-- every icon; Options.lua falls back to a question mark for missing ones.
 ns.MODULES = {
-    { key = "character",   name = "Character",        frames = { "CharacterFrame" } },
-    { key = "bags",        name = "Bags",             frames = bagFrames },
-    { key = "map",         name = "World Map",        frames = { "WorldMapFrame" } },
-    { key = "spellbook",   name = "Spellbook",        frames = { "SpellBookFrame", "PlayerSpellsFrame" } },
-    { key = "talents",     name = "Talents",          frames = { "PlayerTalentFrame", "ClassTalentFrame" } },
-    { key = "questlog",    name = "Quest Log",        frames = { "QuestLogFrame" } },
-    { key = "quest",       name = "Quest & Gossip",   frames = { "QuestFrame", "GossipFrame" } },
-    { key = "social",      name = "Social",           frames = { "FriendsFrame" } },
-    { key = "guild",       name = "Guild",            frames = { "GuildFrame", "CommunitiesFrame" } },
-    { key = "lfg",         name = "Group Finder",     frames = { "LFGParentFrame", "PVEFrame" } },
-    { key = "merchant",    name = "Merchant",         frames = { "MerchantFrame" } },
-    { key = "bank",        name = "Bank",             frames = { "BankFrame" } },
-    { key = "mail",        name = "Mail",             frames = { "MailFrame", "OpenMailFrame" } },
-    { key = "auction",     name = "Auction House",    frames = { "AuctionFrame", "AuctionHouseFrame" } },
-    { key = "professions", name = "Professions",      frames = { "TradeSkillFrame", "CraftFrame", "ProfessionsFrame" } },
-    { key = "trainer",     name = "Trainer",          frames = { "ClassTrainerFrame" } },
-    { key = "loot",        name = "Loot",             frames = { "LootFrame" } },
-    { key = "dressup",     name = "Dressing Room",    frames = { "DressUpFrame" } },
-    { key = "macros",      name = "Macros",           frames = { "MacroFrame" } },
-    { key = "gamemenu",    name = "Game Menu",        frames = { "GameMenuFrame" } },
+    { key = "character",   name = "Character",      icon = "Interface\\Icons\\INV_Misc_Necklace_02",                  frames = { "CharacterFrame" } },
+    { key = "bags",        name = "Bags",           icon = "Interface\\Icons\\INV_Misc_Bag_08",                       frames = bagFrames },
+    { key = "map",         name = "World Map",      icon = "Interface\\Icons\\INV_Misc_Map_01",                       frames = { "WorldMapFrame" } },
+    { key = "spellbook",   name = "Spellbook",      icon = "Interface\\Icons\\INV_Misc_Book_09",                      frames = { "SpellBookFrame", "PlayerSpellsFrame" } },
+    { key = "talents",     name = "Talents",        icon = "Interface\\Icons\\Ability_Marksmanship",                  frames = { "PlayerTalentFrame", "ClassTalentFrame" } },
+    { key = "questlog",    name = "Quest Log",      icon = "Interface\\Icons\\INV_Misc_QuestionMark",                 frames = { "QuestLogFrame" } },
+    { key = "quest",       name = "Quest & Gossip", icon = "Interface\\Icons\\INV_Misc_Note_01",                      frames = { "QuestFrame", "GossipFrame" } },
+    { key = "social",      name = "Social",         icon = "Interface\\Icons\\Achievement_GuildPerk_EverybodysFriend", frames = { "FriendsFrame" } },
+    { key = "guild",       name = "Guild",          icon = "Interface\\Icons\\Achievement_GuildPerk_MobileBanking",   frames = { "GuildFrame", "CommunitiesFrame" } },
+    { key = "lfg",         name = "Group Finder",   icon = "Interface\\Icons\\INV_Misc_GroupLooking",                 frames = { "LFGParentFrame", "PVEFrame" } },
+    { key = "merchant",    name = "Merchant",       icon = "Interface\\Icons\\INV_Misc_Coin_01",                      frames = { "MerchantFrame" } },
+    { key = "bank",        name = "Bank",           icon = "Interface\\Icons\\INV_Misc_Coin_17",                      frames = { "BankFrame" } },
+    { key = "mail",        name = "Mail",           icon = "Interface\\Icons\\INV_Letter_15",                         frames = { "MailFrame", "OpenMailFrame" } },
+    { key = "auction",     name = "Auction House",  icon = "Interface\\Icons\\INV_Misc_AuctionHouse",                 frames = { "AuctionFrame", "AuctionHouseFrame" } },
+    { key = "professions", name = "Professions",    icon = "Interface\\Icons\\Trade_BlackSmithing",                   frames = { "TradeSkillFrame", "CraftFrame", "ProfessionsFrame" } },
+    { key = "trainer",     name = "Trainer",        icon = "Interface\\Icons\\Trade_Engraving",                       frames = { "ClassTrainerFrame" } },
+    { key = "loot",        name = "Loot",           icon = "Interface\\Icons\\INV_Misc_Bag_10_Blue",                  frames = { "LootFrame" } },
+    { key = "dressup",     name = "Dressing Room",  icon = "Interface\\Icons\\INV_Chest_Cloth_17",                    frames = { "DressUpFrame" } },
+    { key = "macros",      name = "Macros",         icon = "Interface\\Icons\\INV_Misc_Gear_01",                      frames = { "MacroFrame" } },
+    { key = "gamemenu",    name = "Game Menu",      icon = "Interface\\Icons\\INV_Misc_Gear_08",                      frames = { "GameMenuFrame" } },
 }
 
 ns.MIN, ns.MAX = 0.5, 2.0

@@ -2,7 +2,7 @@
 ## Title: UI Scaler
 ## Notes: Resize the default windows (character, bags, map, and more) one at a time. /uis to open.
 ## Author: John
-## Version: 1.0.0
+## Version: 1.1.0
 ## SavedVariables: UIScalerDB
 
 Core.lua

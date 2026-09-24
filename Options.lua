@@ -3,19 +3,31 @@
 
 local ADDON, ns = ...
 
-local ROW_H, SIDEBAR_W = 22, 170
+local ROW_H, SIDEBAR_W, TOP = 22, 180, 44
+local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 local panel, tabs, selected = nil, {}, nil
 local slider, input, header, status
 local updating = false
 
 local function pct(v) return math.floor(v * 100 + 0.5) end
 
+-- Icon paths vary between clients; show a question mark rather than a blank.
+local function iconFor(path)
+    if GetFileIDFromPath and not GetFileIDFromPath(path) then
+        return FALLBACK_ICON
+    end
+    return path
+end
+
 local function refresh()
     for _, tab in ipairs(tabs) do
         local on = tab.module.key == selected.key
+        local value = pct(ns.GetScale(tab.module.key))
         tab.label:SetText(tab.module.name)
-        tab.value:SetText(pct(ns.GetScale(tab.module.key)) .. "%")
+        -- Gold when changed, dim when untouched: what have I actually changed?
+        tab.value:SetText((value == 100 and "|cff8a7a58" or "|cffffd100") .. value .. "%|r")
         tab.bg:SetShown(on)
+        tab.accent:SetShown(on)
         tab.label:SetFontObject(on and "GameFontHighlight" or "GameFontNormal")
     end
 
@@ -48,8 +60,16 @@ local function makeButton(parent, text, width)
 end
 
 local function build()
-    panel = CreateFrame("Frame", "UIScalerFrame", UIParent, "BasicFrameTemplateWithInset")
-    panel:SetSize(560, #ns.MODULES * ROW_H + 80)
+    -- Blizzard's own dark dialog art with the gold trim, instead of the
+    -- generic options-page template.
+    panel = CreateFrame("Frame", "UIScalerFrame", UIParent, "BackdropTemplate")
+    panel:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tile = true, tileSize = 32, edgeSize = 32,
+        insets = { left = 11, right = 12, top = 12, bottom = 11 },
+    })
+    panel:SetSize(580, #ns.MODULES * ROW_H + TOP + 36)
     panel:SetPoint("CENTER")
     panel:SetFrameStrata("DIALOG")
     panel:SetMovable(true)
@@ -61,30 +81,44 @@ local function build()
     panel:Hide()
     tinsert(UISpecialFrames, "UIScalerFrame") -- Escape closes it
 
-    local title = panel.TitleText
-    if not title then
-        title = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        title:SetPoint("TOP", 0, -5)
-    end
+    -- The plain backdrop has no title or close button, so add both.
+    local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOP", 0, -18)
     title:SetText("UI Scaler")
+
+    local close = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
+    close:SetPoint("TOPRIGHT", -6, -6)
 
     -- Sidebar: one tab per module.
     for i, m in ipairs(ns.MODULES) do
         local tab = CreateFrame("Button", nil, panel)
         tab:SetSize(SIDEBAR_W, ROW_H)
-        tab:SetPoint("TOPLEFT", 12, -30 - (i - 1) * ROW_H)
+        tab:SetPoint("TOPLEFT", 18, -TOP - (i - 1) * ROW_H)
         tab.module = m
 
+        -- Selected row: a faint gold wash plus a gold bar on the left edge.
         tab.bg = tab:CreateTexture(nil, "BACKGROUND")
         tab.bg:SetAllPoints()
-        tab.bg:SetColorTexture(1, 0.82, 0, 0.18)
+        tab.bg:SetColorTexture(1, 0.82, 0, 0.10)
+
+        tab.accent = tab:CreateTexture(nil, "ARTWORK")
+        tab.accent:SetPoint("TOPLEFT", 0, 0)
+        tab.accent:SetPoint("BOTTOMLEFT", 0, 0)
+        tab.accent:SetWidth(2)
+        tab.accent:SetColorTexture(0.85, 0.65, 0.13)
 
         local hl = tab:CreateTexture(nil, "HIGHLIGHT")
         hl:SetAllPoints()
         hl:SetColorTexture(1, 1, 1, 0.08)
 
+        tab.icon = tab:CreateTexture(nil, "ARTWORK")
+        tab.icon:SetSize(20, 20)
+        tab.icon:SetPoint("LEFT", 4, 0)
+        tab.icon:SetTexture(iconFor(m.icon))
+        tab.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) -- crop the border baked into icons
+
         tab.label = tab:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        tab.label:SetPoint("LEFT", 6, 0)
+        tab.label:SetPoint("LEFT", tab.icon, "RIGHT", 6, 0)
         tab.value = tab:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         tab.value:SetPoint("RIGHT", -6, 0)
 
@@ -96,13 +130,19 @@ local function build()
     end
 
     -- Right-hand pane.
-    local left = SIDEBAR_W + 40
+    local left = SIDEBAR_W + 48
+
+    local divider = panel:CreateTexture(nil, "ARTWORK")
+    divider:SetPoint("TOPLEFT", SIDEBAR_W + 30, -TOP)
+    divider:SetPoint("BOTTOMLEFT", SIDEBAR_W + 30, 20)
+    divider:SetWidth(1)
+    divider:SetColorTexture(0.85, 0.65, 0.13, 0.35)
 
     header = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    header:SetPoint("TOPLEFT", left, -40)
+    header:SetPoint("TOPLEFT", left, -TOP - 8)
 
     status = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", left, -70)
+    status:SetPoint("TOPLEFT", left, -TOP - 38)
     status:SetJustifyH("LEFT")
 
     -- Built by hand rather than from OptionsSliderTemplate, which has been
@@ -110,7 +150,7 @@ local function build()
     slider = CreateFrame("Slider", nil, panel, "BackdropTemplate")
     slider:SetOrientation("HORIZONTAL")
     slider:SetSize(260, 17)
-    slider:SetPoint("TOPLEFT", left, -130)
+    slider:SetPoint("TOPLEFT", left, -TOP - 98)
     slider:SetBackdrop({
         bgFile = "Interface\\Buttons\\UI-SliderBar-Background",
         edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
@@ -118,6 +158,9 @@ local function build()
         insets = { left = 3, right = 3, top = 6, bottom = 6 },
     })
     slider:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+    -- Same Blizzard art, tinted gold to match the panel trim.
+    slider:GetThumbTexture():SetVertexColor(1, 0.82, 0.3)
+    slider:SetBackdropBorderColor(1, 0.82, 0.3)
     slider:SetMinMaxValues(pct(ns.MIN), pct(ns.MAX))
     slider:SetValueStep(5)
     slider:SetObeyStepOnDrag(true)
@@ -162,28 +205,28 @@ local function build()
         if prev then
             b:SetPoint("LEFT", prev, "RIGHT", 4, 0)
         else
-            b:SetPoint("TOPLEFT", left, -180)
+            b:SetPoint("TOPLEFT", left, -TOP - 148)
         end
         b:SetScript("OnClick", function() setScale(p) end)
         prev = b
     end
 
     local reset = makeButton(panel, "Reset to 100%", 130)
-    reset:SetPoint("TOPLEFT", left, -216)
+    reset:SetPoint("TOPLEFT", left, -TOP - 184)
     reset:SetScript("OnClick", function()
         ns.Reset(selected.key)
         refresh()
     end)
 
     local resetAll = makeButton(panel, "Reset all", 100)
-    resetAll:SetPoint("BOTTOMRIGHT", -16, 14)
+    resetAll:SetPoint("BOTTOMRIGHT", -20, 20)
     resetAll:SetScript("OnClick", function()
         ns.ResetAll()
         refresh()
     end)
 
     local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hint:SetPoint("BOTTOMLEFT", left, 20)
+    hint:SetPoint("BOTTOMLEFT", left, 26)
     hint:SetText("Tip: scroll the mouse wheel over the slider.")
 
     panel:SetScript("OnShow", refresh)
