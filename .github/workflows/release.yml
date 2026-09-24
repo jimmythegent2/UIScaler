@@ -1,0 +1,43 @@
+# Builds UIScaler.zip on every push to main and attaches it to a release.
+#
+# GitHub's own "Download ZIP" names the folder UIScaler-main, and WoW only
+# loads an addon whose folder matches its .toc name, so we zip it ourselves
+# with the folder named UIScaler.
+#
+# The release is named after the ## Version line in UIScaler.toc. Bump it for
+# a new release; pushes without a bump refresh the current release's zip.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build UIScaler.zip
+        run: |
+          mkdir -p build/UIScaler
+          cp UIScaler.toc *.lua README.md build/UIScaler/
+          cd build && zip -r ../UIScaler.zip UIScaler
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(sed -n 's/^## Version: *//p' UIScaler.toc | tr -d '\r')
+          tag="v$version"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" UIScaler.zip --clobber
+          else
+            gh release create "$tag" UIScaler.zip --title "UI Scaler $version" \
+              --notes "Download **UIScaler.zip** below, unzip it, and move the UIScaler folder into your WoW Interface/AddOns folder."
+          fi

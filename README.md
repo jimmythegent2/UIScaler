@@ -6,7 +6,15 @@ each on its own tab with a percentage slider.
 
 ## Install
 
-Clone into your client's AddOns folder, so the folder is named `UIScaler`:
+**Easiest:** download
+[UIScaler.zip](https://github.com/jimmythegent2/UIScaler/releases/latest/download/UIScaler.zip)
+(also under **Releases** on the right of the repo page), unzip it, and move
+the `UIScaler` folder into your WoW `Interface/AddOns` folder. Don't use the
+green **Code → Download ZIP** button — that names the folder `UIScaler-main`
+and WoW won't load it.
+
+**With git**, clone into your client's AddOns folder instead, so updates are
+a `git pull`:
 
 ```bash
 cd "C:/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns"
@@ -14,10 +22,11 @@ git clone https://github.com/jimmythegent2/UIScaler.git
 ```
 
 Swap `_classic_beta_` for `_retail_`, `_classic_`, or `_classic_era_` for
-other clients. No git? Use **Code → Download ZIP** on GitHub, unzip into
-AddOns, and rename the folder from `UIScaler-main` to `UIScaler`.
+other clients. To update: `git pull` inside the `UIScaler` folder, then
+`/reload` in game.
 
-To update: `git pull` inside the `UIScaler` folder, then `/reload` in game.
+Releases are built automatically by `.github/workflows/release.yml` on every
+push to `main`, named after the `## Version` line in `UIScaler.toc`.
 
 ## Use
 
